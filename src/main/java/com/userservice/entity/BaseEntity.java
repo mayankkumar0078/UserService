@@ -9,10 +9,14 @@ import java.util.Date;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import com.userservice.constants.StatusType;
 
 @MappedSuperclass
@@ -21,15 +25,20 @@ public abstract class BaseEntity extends AbstractEntity {
 
     private Date createdDate;
 
+    @ManyToOne
+    @JsonIgnore 
     private User createdBy;
 
+    @JsonIgnore 
     private Date lastModifiedDate;
 
+    @JsonIgnore 
     private User lastModifiedBy;
 
     @Enumerated(EnumType.STRING)
     private StatusType status;
-
+    
+    @JsonSerialize(using=DateSerializer.class)
     public Date getCreatedDate() {
 	return createdDate;
     }

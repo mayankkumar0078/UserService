@@ -19,6 +19,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @MappedSuperclass
 public abstract class AbstractEntity implements Serializable, Cloneable, Comparable<Object> {
     private static final long serialVersionUID = 1L;
@@ -28,6 +30,7 @@ public abstract class AbstractEntity implements Serializable, Cloneable, Compara
     private Long id;
 
     @Version
+    @JsonIgnore
     private long version = 0;
 
     public String toString() {

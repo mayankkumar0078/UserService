@@ -1,24 +1,17 @@
 
 package com.userservice.entity;
-/**
- * @author Mayank
- * 
- */
+
 import java.sql.Date;
 import java.util.Collection;
 
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.userservice.constants.StatusType;
 /**
  * 
@@ -38,7 +31,7 @@ public class User  extends NamedEntity  implements UserDetails {
 
 	@Column(nullable = false)
     @Length(max = 255)
-    private String password;
+    @JsonIgnore private String password;
 
     @Column(nullable = false)
     @Length(max = 255)
@@ -53,10 +46,10 @@ public class User  extends NamedEntity  implements UserDetails {
     private String lastName;
     
     @Column(nullable = false)
-    private Date passwordLastChangeDate;
+    @JsonIgnore private Date passwordLastChangeDate;
 	
     @Column(nullable=false)
-    private int loginAttemptsLeft;
+    @JsonIgnore private int loginAttemptsLeft;
     
  
     

@@ -1,4 +1,4 @@
-package com.userservice.controller.rest;
+package com.userservice.resource;
 
 import java.io.IOException;
 import java.util.Date;
@@ -16,9 +16,9 @@ import com.userservice.crypto.exception.CryptoException;
  */
 @RestController
 @RequestMapping(value = "/rp")
-public class RestorePasswordEndpoint extends UserAccountEndpointsCommon
+public class RestorePasswordResource extends UserAccountResourceCommon
 {
-	private static Logger log = Logger.getLogger(RestorePasswordEndpoint.class);
+	private static Logger log = Logger.getLogger(RestorePasswordResource.class);
 
 	
 	@RequestMapping

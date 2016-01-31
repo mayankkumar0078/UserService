@@ -1,4 +1,4 @@
-package com.userservice.controller.rest;
+package com.userservice.resource;
 
 import java.util.Date;
 
@@ -13,7 +13,7 @@ import com.userservice.crypto.service.CryptoService;
 import com.userservice.service.UserAccountService;
 import com.userservice.util.FlowsUtil;
 
-public abstract class UserAccountEndpointsCommon {
+public abstract class UserAccountResourceCommon {
 	@Autowired
 	private UserAccountProperties userAccountProperties;
 

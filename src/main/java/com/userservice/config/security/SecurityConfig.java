@@ -65,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.cacheControl()
 				.and()
 				.authorizeRequests()
-				.antMatchers("/userModule/User/**", "/aa/**", "/rp/**")
+				.antMatchers("/userModule/Users/**", "/aa/**", "/rp/**","/userModule/BookShelves/**")
 				.permitAll()
 				.anyRequest()
 				.authenticated()

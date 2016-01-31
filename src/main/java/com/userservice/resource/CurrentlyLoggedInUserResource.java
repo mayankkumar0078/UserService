@@ -1,4 +1,4 @@
-package com.userservice.controller.rest;
+package com.userservice.resource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping
-public class CurrentlyLoggedInUser {
+public class CurrentlyLoggedInUserResource {
 	private static final Logger log = Logger
-			.getLogger(CurrentlyLoggedInUser.class);
+			.getLogger(CurrentlyLoggedInUserResource.class);
 
-	public CurrentlyLoggedInUser() {
+	public CurrentlyLoggedInUserResource() {
 	}
 
 	/**

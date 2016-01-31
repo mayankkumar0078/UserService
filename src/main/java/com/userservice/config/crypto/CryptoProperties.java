@@ -1,4 +1,4 @@
-package com.userservice.crypto.config;
+package com.userservice.config.crypto;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

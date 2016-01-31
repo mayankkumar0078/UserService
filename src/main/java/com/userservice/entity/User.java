@@ -20,7 +20,7 @@ import com.userservice.constants.StatusType;
  */
 
 @Entity
-public class User  extends NamedEntity  implements UserDetails {
+public class User  extends BaseEntity  implements UserDetails {
    
 	private static final long serialVersionUID = 1L;
 
@@ -127,21 +127,24 @@ public class User  extends NamedEntity  implements UserDetails {
 	}
 
 	public String getUsername() {
-		return super.getName();
+		return email;
 	}
-
+	@JsonIgnore
 	public boolean isAccountNonExpired() {
 		return StatusType.ACTIVE.toString().equals(super.getStatus().toString());
 	}
-
+	
+	@JsonIgnore
 	public boolean isAccountNonLocked() {
 		return StatusType.ACTIVE.toString().equals(super.getStatus().toString());
 	}
-
+	
+	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
 		return StatusType.ACTIVE.toString().equals(super.getStatus().toString());
 	}
-
+	
+	@JsonIgnore
 	public boolean isEnabled() {
 		return StatusType.ACTIVE.toString().equals(super.getStatus().toString());
 	}

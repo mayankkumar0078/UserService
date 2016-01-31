@@ -30,7 +30,10 @@ public abstract class UserAccountConstants {
 	public static final String ACTIVATE_ACCOUNT_ENDPOINT = "/aa";
 	public static final String RESTORE_PASSWORD_ENDPOINT = "/rp";
 	public static final String CHANGE_PASSWORD_ENDPOINT = "/cp";
-
+	
+	public static final int APPLICATION_CODE_USER_SERVICE=1;
+	
+	
 	public class MailMessage {
 		public static final String AUTHENTICATION_MAIL_SUBJECT = "CollegeDays Authentication Service: Account Created Successfully";
 		public static final String RESTORE_PASSWORD_MAIL_SUBJECT = "CollegeDays  Authentication Service: Password Restore Request";

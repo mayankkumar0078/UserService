@@ -7,7 +7,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.userservice.crypto.config.CryptoProperties;
+import com.userservice.config.crypto.CryptoProperties;
 import com.userservice.crypto.interfaces.KeystoreService;
 
 @Service("keystoreService")

@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -26,11 +27,13 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.util.Assert;
 
 import com.userservice.constants.AccountState;
+import com.userservice.constants.StatusType;
 import com.userservice.constants.UserAccountConstants;
 import com.userservice.crypto.service.CryptoService;
 import com.userservice.dao.UserAccountRepository;
+import com.userservice.dto.UserDTO;
 import com.userservice.entity.User;
-import com.userservice.exception.signup.SignUpException;
+import com.userservice.exception.UserServiceException;
 import com.userservice.policy.UserPasswordPolicy;
 import com.userservice.repository.policy.PasswordPolicyFactory;
 import com.userservice.repository.policy.PasswordPolicyRepository;
@@ -52,7 +55,7 @@ public class UserAccountService {
 	private static final String SETTING_A_NEW_PASSWORD_HAS_FAILED_PLEASE_NOTE_THE_PASSWORD_POLICY_AND_TRY_AGAIN_ERROR_MESSAGE = "Setting a new password has failed. Please note the password policy and try again. Error message: ";
 	public static final String ACCOUNT_CREATION_HAS_FAILED_PASSWORDS_DO_NOT_MATCH = "Account creation has failed. These passwords don't match";
 
-	private static final String ACCOUNT_LOCKED_OR_DOES_NOT_EXIST = "Account is locked or does not exist";
+	private static final String ACCOUNT_LOCKED_OR_DOES_NOT_EXIST = "Either User Account is Locked or Non existant or Not Active";
 
 	private static final String LINK_HAS_EXPIRED = "link has expired";
 
@@ -80,20 +83,17 @@ public class UserAccountService {
 	@Autowired
 	private CryptoService cryptoService;
 
-	public String createAccount(String email, String password,
-			String retypedPassword, String firstName, String lastName,
-			String path) throws SignUpException {
+	public User createAccount(UserDTO userDTO, String path)
+			throws UserServiceException {
 
-		
 		UserPasswordPolicy userPasswordPolicy = getPasswordPolicy();
 
-		validateEmail(email);
+		validateEmail(userDTO.getEmail());
 
-		validateRetypedPassword(password, retypedPassword);
-		validatePassword(password, userPasswordPolicy);
-		internalCreateAccount(email, encodeString(password), firstName,
-				lastName, path);
-		return "Success";
+		validateRetypedPassword(userDTO.getPassword(), userDTO.getConfirmPassword());
+		validatePassword(userDTO.getPassword(), userPasswordPolicy);
+		return internalCreateAccount(userDTO.getEmail(), encodeString(userDTO.getPassword()), userDTO.getFirstName(),
+				userDTO.getLastName(), path);
 	}
 
 	private UserPasswordPolicy getPasswordPolicy() {
@@ -101,25 +101,27 @@ public class UserAccountService {
 				.getPasswordPolicy();
 	}
 
-	private void validateEmail(String email) throws SignUpException { // need to
+	private void validateEmail(String email) throws UserServiceException { // need to
 																		// modify
 																		// this
 																		// method
 		if (!email.contains("@")) {
-			throw new SignUpException(EMAIL_NOT_VALID);
+			throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),EMAIL_NOT_VALID);
 		}
 	}
 
 	private void validateRetypedPassword(String password, String retypedPassword)
-			throws SignUpException {
+			throws UserServiceException {
 		if (!password.equals(retypedPassword)) {
-			throw new SignUpException(
+			throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),
 					ACCOUNT_CREATION_HAS_FAILED_PASSWORDS_DO_NOT_MATCH);
 		}
 	}
 
 	private void validatePassword(String password,
-			UserPasswordPolicy userPasswordPolicy) throws SignUpException {
+			UserPasswordPolicy userPasswordPolicy) throws UserServiceException {
 		validateAgainstBlacklistedPasswords(password, userPasswordPolicy);
 
 		validatePasswordMaxLength(password, userPasswordPolicy);
@@ -131,7 +133,7 @@ public class UserAccountService {
 	}
 
 	private void validateCharactersTypeCounts(String password,
-			UserPasswordPolicy userPasswordPolicy) throws SignUpException {
+			UserPasswordPolicy userPasswordPolicy) throws UserServiceException {
 		int uppersCounter = 0;
 		int lowersCounter = 0;
 		int numericCounter = 0;
@@ -179,37 +181,41 @@ public class UserAccountService {
 		formatter.close();
 
 		if (!retVal.isEmpty()) {
-			throw new SignUpException(
+			throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),
 					SETTING_A_NEW_PASSWORD_HAS_FAILED_PLEASE_NOTE_THE_PASSWORD_POLICY_AND_TRY_AGAIN_ERROR_MESSAGE
 							+ "; " + retVal);
 		}
 	}
 
 	private void validatePasswordMinLength(String password,
-			UserPasswordPolicy userPasswordPolicy) throws SignUpException {
+			UserPasswordPolicy userPasswordPolicy) throws UserServiceException {
 		if (password.length() < userPasswordPolicy.getPasswordMinLength()) {
-			throw new SignUpException(
+			throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),
 					SETTING_A_NEW_PASSWORD_HAS_FAILED_PLEASE_NOTE_THE_PASSWORD_POLICY_AND_TRY_AGAIN_ERROR_MESSAGE
 							+ "; " + PASSWORD_IS_TOO_SHORT);
 		}
 	}
 
 	private void validatePasswordMaxLength(String password,
-			UserPasswordPolicy userPasswordPolicy) throws SignUpException {
+			UserPasswordPolicy userPasswordPolicy) throws UserServiceException {
 		if (password.length() > userPasswordPolicy.getPasswordMaxLength()) {
-			throw new SignUpException(
+			throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),
 					SETTING_A_NEW_PASSWORD_HAS_FAILED_PLEASE_NOTE_THE_PASSWORD_POLICY_AND_TRY_AGAIN_ERROR_MESSAGE
 							+ "; " + PASSWORD_IS_TOO_LONG);
 		}
 	}
 
 	private void validateAgainstBlacklistedPasswords(String password,
-			UserPasswordPolicy userPasswordPolicy) throws SignUpException {
+			UserPasswordPolicy userPasswordPolicy) throws UserServiceException {
 		List<String> blackList = userPasswordPolicy.getPasswordBlackList();
 		if (blackList != null) {
 			for (String forbidenPswd : blackList) {
 				if (password.equalsIgnoreCase(forbidenPswd)) {
-					throw new SignUpException(
+					throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+							HttpStatus.NOT_ACCEPTABLE.value(),
 							SETTING_A_NEW_PASSWORD_HAS_FAILED_PLEASE_NOTE_THE_PASSWORD_POLICY_AND_TRY_AGAIN_ERROR_MESSAGE
 									+ "; " + PASSWORD_CANNOT_BE_USED);
 				}
@@ -223,12 +229,12 @@ public class UserAccountService {
 		return encodedPassword;
 	}
 
-	private void internalCreateAccount(String email, String encodedPassword,
+	private User internalCreateAccount(String email, String encodedPassword,
 			String firstName, String lastName, String serverPath)
-			throws SignUpException {
+			throws UserServiceException {
 		email = email.toLowerCase();
 		log.info("createAccount() for user " + email);
-
+		User user=null;
 		try {
 			User oauthUser = null;
 
@@ -245,18 +251,19 @@ public class UserAccountService {
 				} else {
 					log.error("cannot create account - user " + email
 							+ " already exist.");
-					throw new SignUpException(USER_ALREADY_EXIST);
+					throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+							HttpStatus.NOT_ACCEPTABLE.value(),USER_ALREADY_EXIST);
 				}
 			}
 
 			Collection<? extends GrantedAuthority> authorities = setAuthorities(); // set
 																					// authorities
-			User user = new User(encodedPassword, email, firstName, lastName,
+			user = new User(encodedPassword, email, firstName, lastName,
 					new Date(System.currentTimeMillis()), passwordPolicyFactory
 							.getDefaultPasswordPolicyRepository()
 							.getDefaultPasswordPolicy()
 							.getMaxPasswordEntryAttempts());
-
+			//user.setStatus(StatusType.ACTIVE);
 			repository.createUser(user);
 		}
 
@@ -266,7 +273,8 @@ public class UserAccountService {
 			Assert.isTrue(msg.contains("Duplicate entry"));
 
 			log.error(msg);
-			throw new SignUpException(USER_ALREADY_EXIST);
+			throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),USER_ALREADY_EXIST);
 		}
 
 		log.info("Manager: sending registration email to " + email + "...");
@@ -287,8 +295,10 @@ public class UserAccountService {
 					"authentication.vm", activationUrl);
 		} catch (MailException me) {
 			log.error(me.getMessage());
-			throw new SignUpException(me.getMessage());
+			throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),me.getMessage());
 		}
+		return user;
 	}
 
 	private void sendMail(String firstName, String email, String mailSubject,
@@ -373,7 +383,7 @@ public class UserAccountService {
 	}
 
 	public String handleForgotPassword(String email, String serverPath)
-			throws SignUpException {
+			throws UserServiceException {
 		validateEmail(email);
 
 		// if account is already locked, no need to ask the user the secret
@@ -381,7 +391,8 @@ public class UserAccountService {
 		AccountState accountState = getAccountState(email);
 		log.info("Account Current state is : " + accountState);
 		if (accountState != AccountState.OK) {
-			throw new SignUpException(ACCOUNT_LOCKED_OR_DOES_NOT_EXIST);
+			throw new UserServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),ACCOUNT_LOCKED_OR_DOES_NOT_EXIST);
 		}
 
 		return sendPasswordRestoreMail(email, serverPath);
@@ -407,6 +418,54 @@ public class UserAccountService {
 
 	public Date getPasswordLastChangeDate(String email) {
 		return repository.getPasswordLastChangeDate(email);
+	}
+	
+	public User getUser(String username) throws UserServiceException{
+		try{
+			return (User)repository.loadUserByUsername(username);
+		}catch(UsernameNotFoundException e){
+			log.error(e.getMessage());
+			throw new UserServiceException(1, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(), ACCOUNT_LOCKED_OR_DOES_NOT_EXIST);
+		}
+	}
+
+	public List<User> getUsers() throws UserServiceException{
+		return repository.findAll();
+	}
+
+	public User updateUser(UserDTO userDTO) throws UserServiceException{
+		User user=null;
+		try{
+			user= (User)repository.loadUserByUsername(userDTO.getEmail());
+		}catch(UsernameNotFoundException e){
+			log.error(e.getMessage());
+			throw new UserServiceException(1, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(), ACCOUNT_LOCKED_OR_DOES_NOT_EXIST);
+		}
+		
+		if(null==user.getStatus()){
+			throw new UserServiceException(1, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(), ACCOUNT_LOCKED_OR_DOES_NOT_EXIST);
+		}
+		user.setEmail(userDTO.getEmail());
+		user.setFirstName(userDTO.getFirstName());
+		user.setLastName(userDTO.getLastName());
+		repository.updateUser(user);
+		return user;
+		
+	}
+
+	public void deleteUser(String username) throws UserServiceException {
+		try{
+			repository.deleteUser(username);
+		}catch(UsernameNotFoundException e){
+			log.error(e.getMessage());
+			throw new UserServiceException(1, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(), ACCOUNT_LOCKED_OR_DOES_NOT_EXIST);
+		}
+		
+		
 	}
 
 }

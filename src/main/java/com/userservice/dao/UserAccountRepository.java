@@ -1,10 +1,12 @@
 package com.userservice.dao;
 
 import java.sql.Date;
+import java.util.List;
 
 import org.springframework.security.provisioning.UserDetailsManager;
 
 import com.userservice.constants.AccountState;
+import com.userservice.entity.User;
 /**
  * 
  * @author MAYANK
@@ -27,5 +29,7 @@ public interface UserAccountRepository extends UserDetailsManager{
 	Date getPasswordLastChangeDate(String email);
 	
 	void setAuthority(String username, String authority);
-
+	List<User> findAll(); 
+	
+	void save(User user);
 }

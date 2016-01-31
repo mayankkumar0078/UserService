@@ -1,4 +1,4 @@
-package com.userservice.controller.rest;
+package com.userservice.resource;
 
 import java.io.IOException;
 
@@ -21,10 +21,10 @@ import com.userservice.crypto.exception.CryptoException;
  */
 @RestController
 @RequestMapping(value = "/aa")
-public class ActivateAccountEndpoint extends UserAccountEndpointsCommon {
+public class ActivateAccountResource extends UserAccountResourceCommon {
 
 	private static final Logger log = Logger
-			.getLogger(ActivateAccountEndpoint.class);
+			.getLogger(ActivateAccountResource.class);
 
 	@Autowired
 	private UserAccountProperties properties;

@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.userservice.crypto.config.CryptoProperties;
+import com.userservice.config.crypto.CryptoProperties;
 import com.userservice.crypto.exception.CryptoException;
 import com.userservice.crypto.interfaces.CryptoProvider;
 import com.userservice.crypto.interfaces.ICryptoUtil;

@@ -34,7 +34,8 @@ public abstract class BaseEntity extends AbstractEntity {
 
     @JsonIgnore 
     private User lastModifiedBy;
-
+    
+    
     @Enumerated(EnumType.STRING)
     private StatusType status;
     

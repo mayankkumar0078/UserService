@@ -1,4 +1,4 @@
-package com.userservice.dao.bookshelf;
+package com.userservice.dao;
 
 
 import java.util.List;
@@ -20,10 +20,10 @@ import com.userservice.entity.User;
 @Transactional
 public interface BookShelfRepository extends JpaRepository<BookShelf, Long> {
 	
-	@Query("Select bs from BookShelf bs where bs.owner=:user AND bs.name=:name")
+	@Query("Select bs from BookShelf bs where bs.userId=:user AND bs.bookShelfName=:name")
 	public BookShelf findByUsernameAndShelfName(@Param("user") User user,@Param("name") String name);
 	
-	@Query("Select bs from BookShelf bs where bs.owner=:user")
+	@Query("Select bs from BookShelf bs where bs.userId=:user")
 	public List<BookShelf> getAllBookShelvesForUsername(@Param("user") User user);
 }
 

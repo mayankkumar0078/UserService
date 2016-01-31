@@ -1,18 +1,35 @@
 package com.userservice.entity;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "owner_id"})})
-public class BookShelf extends NamedEntity {
+@Table(name = "book_shelf" ,uniqueConstraints = {@UniqueConstraint(columnNames = {"book_shelf_name", "user_id"})})
+public class BookShelf extends BaseEntity {
 	
+	@Column(name="BOOK_SHELF_NAME")
+	private String bookShelfName;
 	private boolean isActive;
 	
+	@OneToMany(cascade = CascadeType.ALL)
+    private Set<BookInBookShelf> booksInBookShelves;
+
 	@ManyToOne
-	private User owner;
+    @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)
+    private User userId;
+	
+	/*@Column(name = "BOOK_SHELF_ID", unique = true)
+    @NotNull
+    private Integer bookShelfId;*/
 	
 
 	
@@ -31,12 +48,29 @@ public class BookShelf extends NamedEntity {
 		this.isActive = isActive;
 	}
 
-	public User getOwner() {
-		return owner;
+	
+	public Set<BookInBookShelf> getBooksInBookShelves() {
+		return booksInBookShelves;
 	}
 
-	public void setOwner(User owner) {
-		this.owner = owner;
+	public void setBooksInBookShelves(Set<BookInBookShelf> booksInBookShelves) {
+		this.booksInBookShelves = booksInBookShelves;
+	}
+
+	public User getUserId() {
+		return userId;
+	}
+
+	public void setUserId(User userId) {
+		this.userId = userId;
+	}
+
+	public String getBookShelfName() {
+		return bookShelfName;
+	}
+
+	public void setBookShelfName(String bookShelfName) {
+		this.bookShelfName = bookShelfName;
 	}
 	
 	

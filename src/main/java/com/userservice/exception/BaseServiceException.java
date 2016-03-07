@@ -1,6 +1,6 @@
 package com.userservice.exception;
 
-public class BaseServiceException extends Exception{
+public class BaseServiceException extends RuntimeException{
 	private static final long serialVersionUID = 1L;
 	 // Code Particular to the application
     private int applicationCode;

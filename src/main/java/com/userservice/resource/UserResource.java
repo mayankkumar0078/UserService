@@ -10,7 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,9 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.userservice.constants.UserAccountConstants;
 import com.userservice.dao.UserAccountRepository;
+import com.userservice.dto.LoginDTO;
 import com.userservice.dto.UserDTO;
 import com.userservice.entity.User;
 import com.userservice.exception.ChangePasswordException;
+import com.userservice.exception.UserAuthenticationException;
 import com.userservice.exception.UserServiceException;
 import com.userservice.response.UserResponse;
 import com.userservice.responsetransformer.UserResponseTransformer;
@@ -89,7 +94,7 @@ public class UserResource {
 		log.info("/userModule/User/: email=" + username);
 
 		try {
-			
+
 			User user = userAccountService.getUser(username);
 			System.out.println("user  :" + user);
 			return userResponseTransformer.transformIntoResponse(Arrays
@@ -100,11 +105,11 @@ public class UserResource {
 		}
 
 	}
-	
+
 	@RequestMapping(method = RequestMethod.PUT, produces = { "application/json" })
 	public @ResponseBody UserResponse updateUser(@RequestBody UserDTO userDTO) {
 		log.debug("/userModule/User/  PUT: email=" + userDTO.getEmail());
-		
+
 		try {
 			userResponseTransformer.validateUpdateRequest(userDTO);
 			User user = userAccountService.updateUser(userDTO);
@@ -117,11 +122,12 @@ public class UserResource {
 		}
 
 	}
-	
+
 	@RequestMapping(method = RequestMethod.DELETE, produces = { "application/json" })
-	public @ResponseBody UserResponse deleteUser(@RequestParam("username") String username) {
+	public @ResponseBody UserResponse deleteUser(
+			@RequestParam("username") String username) {
 		log.debug("/userModule/User/  DELETE: email=" + username);
-		
+
 		try {
 			userAccountService.deleteUser(username);
 			return userResponseTransformer.transformIntoResponse(null);
@@ -161,19 +167,17 @@ public class UserResource {
 	 * @return A transfer containing the username and the roles.
 	 */
 
-	/*public UserTransfer getUser() {
-		Authentication authentication = SecurityContextHolder.getContext()
-				.getAuthentication();
-		Object principal = authentication.getPrincipal();
-		if (principal instanceof String
-				&& ((String) principal).equals("anonymousUser")) {
-			// throw new WebApplicationException(401);
-		}
-		UserDetails userDetails = (UserDetails) principal;
-
-		return new UserTransfer(userDetails.getUsername(),
-				this.createRoleMap(userDetails));
-	}*/
+	/*
+	 * public UserTransfer getUser() { Authentication authentication =
+	 * SecurityContextHolder.getContext() .getAuthentication(); Object principal
+	 * = authentication.getPrincipal(); if (principal instanceof String &&
+	 * ((String) principal).equals("anonymousUser")) { // throw new
+	 * WebApplicationException(401); } UserDetails userDetails = (UserDetails)
+	 * principal;
+	 * 
+	 * return new UserTransfer(userDetails.getUsername(),
+	 * this.createRoleMap(userDetails)); }
+	 */
 
 	private Map<String, Boolean> createRoleMap(UserDetails userDetails) {
 		Map<String, Boolean> roles = new HashMap<String, Boolean>();
@@ -214,23 +218,39 @@ public class UserResource {
 	 * @return A transfer containing the authentication token.
 	 */
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public TokenTransfer authenticate(@RequestParam("email") String email,
-			@RequestParam("password") String password) {
+	public TokenTransfer authenticate(@RequestBody LoginDTO loginDTO) {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-				email, password);
+				loginDTO.getEmail(), loginDTO.getPassword());
 		log.info("authentication token is " + authenticationToken);
-		Authentication authentication = this.authManager
-				.authenticate(authenticationToken);
+		Authentication authentication=null;
+		try{
+			authentication = this.authManager
+					.authenticate(authenticationToken);
+			
+		}catch(InternalAuthenticationServiceException ex){
+			log.error(ex.getMessage());
+			throw new UserAuthenticationException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),"Invalid Credentials. Please try again.");
+		}catch(BadCredentialsException ex){
+			log.error(ex.getMessage());
+			throw new UserAuthenticationException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.BAD_REQUEST.value(), 
+					HttpStatus.NOT_ACCEPTABLE.value(),"Invalid Credentials. Please try again.");
+		}
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		log.info("authentication is " + authentication);
 		/*
 		 * Reload user as password of authentication principal will be null
 		 * after authorization and password is needed for token generation
 		 */
-		UserDetails userDetails = this.userService.loadUserByUsername(email);
+		UserDetails userDetails = this.userService.loadUserByUsername(loginDTO
+				.getEmail());
 		log.info("user is :" + userDetails);
-		return new TokenTransfer(
-				tokenAuthenticationService.addAuthentication(authentication));
+		TokenTransfer tokenTransfer = new TokenTransfer();
+		tokenTransfer.setToken(tokenAuthenticationService
+				.addAuthentication(authentication));
+		tokenTransfer.setFirstName(((User) authentication.getPrincipal())
+				.getFirstName());
+		return tokenTransfer;
 	}
 
 }

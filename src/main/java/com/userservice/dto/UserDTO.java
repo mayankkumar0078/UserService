@@ -13,7 +13,7 @@ public class UserDTO extends BaseDTO{
 	@NotNull(message="User First name can't be null")
     private String firstName;
 	
-	@NotNull(message="User's last name can't be null")
+	//@NotNull(message="User's last name can't be null")
     private String lastName;
 	
 	@NotNull(message="User's email can't be null")
@@ -24,7 +24,7 @@ public class UserDTO extends BaseDTO{
 	@Size(message="Password's Size can't be less than five characters" ,min=5)
     private String password;
 	
-	@NotNull(message="Confirm password field can't be null")
+	//@NotNull(message="Confirm password field can't be null")
     private String confirmPassword;
     
     public String getPassword() {

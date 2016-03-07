@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.userservice.dao.DatabaseUserAcountRepository;
 import com.userservice.dao.UserAccountRepository;
+import com.userservice.filter.CORSFilter;
 import com.userservice.repository.policy.PasswordPolicyFactory;
 import com.userservice.repository.policy.PasswordPolicyRepository;
 import com.userservice.repository.policy.PasswordPolicyRepositoryFileImpl;
@@ -54,7 +55,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable();
-
 		http.exceptionHandling()
 				.and()
 				.anonymous()

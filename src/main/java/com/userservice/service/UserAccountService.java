@@ -90,8 +90,8 @@ public class UserAccountService {
 
 		validateEmail(userDTO.getEmail());
 
-		validateRetypedPassword(userDTO.getPassword(), userDTO.getConfirmPassword());
-		validatePassword(userDTO.getPassword(), userPasswordPolicy);
+		//validateRetypedPassword(userDTO.getPassword(), userDTO.getConfirmPassword());
+		//validatePassword(userDTO.getPassword(), userPasswordPolicy);
 		return internalCreateAccount(userDTO.getEmail(), encodeString(userDTO.getPassword()), userDTO.getFirstName(),
 				userDTO.getLastName(), path);
 	}
@@ -122,13 +122,13 @@ public class UserAccountService {
 
 	private void validatePassword(String password,
 			UserPasswordPolicy userPasswordPolicy) throws UserServiceException {
-		validateAgainstBlacklistedPasswords(password, userPasswordPolicy);
+		//validateAgainstBlacklistedPasswords(password, userPasswordPolicy);
 
-		validatePasswordMaxLength(password, userPasswordPolicy);
+		//validatePasswordMaxLength(password, userPasswordPolicy);
 
-		validatePasswordMinLength(password, userPasswordPolicy);
+		//validatePasswordMinLength(password, userPasswordPolicy);
 
-		validateCharactersTypeCounts(password, userPasswordPolicy);
+		//validateCharactersTypeCounts(password, userPasswordPolicy);
 
 	}
 

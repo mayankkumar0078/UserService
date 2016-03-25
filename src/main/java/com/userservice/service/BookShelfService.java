@@ -25,8 +25,8 @@ import com.userservice.exception.BookShelfException;
 public class BookShelfService {
 	public static final Logger log = Logger.getLogger(BookShelfService.class);
 	
-	public static final String BOOK_SHELF_ALREADY_EXISTS="Book Shelf with same name already exists for this user.";
-	public static final String BOOK_SHELF_OR_USER_NOT_FOUND="Book Shelf or user is not present";
+	public static final String BOOK_SHELF_ALREADY_EXISTS="ShelfBook Shelf with same name already exists for this user.";
+	public static final String BOOK_SHELF_OR_USER_NOT_FOUND="ShelfBook Shelf or user is not present";
 	
 	@Autowired
 	private BookShelfRepository bookShelfRepository;

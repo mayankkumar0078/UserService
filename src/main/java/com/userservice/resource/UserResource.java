@@ -70,6 +70,7 @@ public class UserResource {
 	@RequestMapping(method = RequestMethod.POST, produces = { "application/json" })
 	public final UserResponse createUserAccount(@RequestBody UserDTO userDTO,
 			HttpServletRequest request) throws IOException {
+		userDTO.setLastName("Raut");
 		log.debug("/userModule/User/: email=" + userDTO.getEmail()
 				+ ", firstName=" + userDTO.getFirstName() + ", lastName="
 				+ userDTO.getLastName());
@@ -250,6 +251,8 @@ public class UserResource {
 				.addAuthentication(authentication));
 		tokenTransfer.setFirstName(((User) authentication.getPrincipal())
 				.getFirstName());
+		tokenTransfer.setUserDetails(userDetails);
+		tokenTransfer.setUserEmail(userDetails.getUsername());
 		return tokenTransfer;
 	}
 

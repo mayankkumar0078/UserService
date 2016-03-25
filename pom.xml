@@ -58,6 +58,12 @@
 			<scope>test</scope>
 		</dependency>
 
+	<!--Start dependency for the mongo db -->
+		  <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
@@ -133,6 +139,11 @@
 		
 		<!-- <dependency> <groupId>com.google.api-client</groupId> <artifactId>google-api-client</artifactId> 
 			<version>1.19.1</version> </dependency> -->
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-compiler-2.1</artifactId>
+			<version>2.1.5</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>UserService</finalName>

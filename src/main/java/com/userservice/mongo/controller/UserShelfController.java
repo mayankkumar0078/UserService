@@ -2,6 +2,7 @@ package com.userservice.mongo.controller;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import com.userservice.mongo.dto.request.RemoveBookFromShelfReq;
 import com.userservice.mongo.dto.request.RenameShelfReq;
 import com.userservice.mongo.exception.UserShelfServiceException;
 import com.userservice.mongo.response.UserShelfResponse;
+import com.userservice.mongo.response.transformer.UserShelfResponseTransformer;
 import com.userservice.mongo.service.UserShelfService;
 
 
@@ -28,6 +30,9 @@ public class UserShelfController {
 
 	@Resource
 	UserShelfService userShelfService;
+	
+	@Autowired
+	private UserShelfResponseTransformer userShelfResponseTransformer;
 	
 	/**
 	 * Retrieve the book review based on the book id provided
@@ -41,11 +46,9 @@ public class UserShelfController {
 			 response = userShelfService.retrieveUserShelf(userId);
 			 
 		} catch (UserShelfServiceException e) {
-			response.setApplicationCode(e.getApplicationCode());
-			response.setCode(e.getCode());
-			response.setDeveloperMessage(e.getLocalizedMessage());
+			return (UserShelfResponse) userShelfResponseTransformer.buildExceptionResponse(e, response);
 		}
-		return response;
+		return userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
 	/**
@@ -60,11 +63,9 @@ public class UserShelfController {
 			 response = userShelfService.createNewShelf(req);
 			 
 		} catch (UserShelfServiceException e) {
-			response.setApplicationCode(e.getApplicationCode());
-			response.setCode(e.getCode());
-			response.setDeveloperMessage(e.getLocalizedMessage());
+			return (UserShelfResponse) userShelfResponseTransformer.buildExceptionResponse(e, response);
 		}
-		return response;
+		return userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 
 	/**
@@ -79,11 +80,9 @@ public class UserShelfController {
 			 response = userShelfService.updateShelf(userShelfDocument);
 			 
 		} catch (UserShelfServiceException e) {
-			response.setApplicationCode(e.getApplicationCode());
-			response.setCode(e.getCode());
-			response.setDeveloperMessage(e.getLocalizedMessage());
+			return (UserShelfResponse) userShelfResponseTransformer.buildExceptionResponse(e, response);
 		}
-		return response;
+		return userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
 	/**
@@ -98,11 +97,9 @@ public class UserShelfController {
 			 response = userShelfService.addBookToShelf(addBookToShelfReq);
 			 
 		} catch (UserShelfServiceException e) {
-			response.setApplicationCode(e.getApplicationCode());
-			response.setCode(e.getCode());
-			response.setDeveloperMessage(e.getLocalizedMessage());
+			return (UserShelfResponse) userShelfResponseTransformer.buildExceptionResponse(e, response);
 		}
-		return response;
+		return userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
 	/**
@@ -117,11 +114,9 @@ public class UserShelfController {
 			 response = userShelfService.removeBookFromShelf(request);
 			 
 		} catch (UserShelfServiceException e) {
-			response.setApplicationCode(e.getApplicationCode());
-			response.setCode(e.getCode());
-			response.setDeveloperMessage(e.getLocalizedMessage());
+			return (UserShelfResponse) userShelfResponseTransformer.buildExceptionResponse(e, response);
 		}
-		return response;
+		return userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 
 	/**
@@ -136,11 +131,9 @@ public class UserShelfController {
 			 response = userShelfService.deleteShelf(request);
 			 
 		} catch (UserShelfServiceException e) {
-			response.setApplicationCode(e.getApplicationCode());
-			response.setCode(e.getCode());
-			response.setDeveloperMessage(e.getLocalizedMessage());
+			return (UserShelfResponse) userShelfResponseTransformer.buildExceptionResponse(e, response);
 		}
-		return response;
+		return userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
 	/**
@@ -155,11 +148,9 @@ public class UserShelfController {
 			 response = userShelfService.renameShelf(request);
 			 
 		} catch (UserShelfServiceException e) {
-			response.setApplicationCode(e.getApplicationCode());
-			response.setCode(e.getCode());
-			response.setDeveloperMessage(e.getLocalizedMessage());
+			return (UserShelfResponse) userShelfResponseTransformer.buildExceptionResponse(e, response);
 		}
-		return response;
+		return userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
 }

@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 
 import com.userservice.constants.UserAccountConstants;
 import com.userservice.exception.BaseServiceException;
-import com.userservice.exception.UserServiceException;
 import com.userservice.response.BaseResponse;
 
 public abstract class BaseResponseTransformer {

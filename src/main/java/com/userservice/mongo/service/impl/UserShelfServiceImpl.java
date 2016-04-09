@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.userservice.constants.UserAccountConstants;
 import com.userservice.mongo.document.UserShelfDocument;
 import com.userservice.mongo.domain.Shelf;
 import com.userservice.mongo.domain.ShelfBook;
@@ -23,7 +24,9 @@ import com.userservice.mongo.service.UserShelfService;
 
 @Service
 public class UserShelfServiceImpl implements UserShelfService{
-
+	public static String CANT_PROCESS_REQUEST = "Can't Proccess request right now";
+	public static String CANT_RETRIEVE_USER_SHELF = "Can't retrieve user shelf";
+	public static String SHELF_ALREADY_PRESNT = "Shelf is already Present. Create a new One !";
 	@Autowired
 	private UserShelfRepository userShelfRepository;
 
@@ -35,7 +38,8 @@ public class UserShelfServiceImpl implements UserShelfService{
 			UserShelfDocument userShelfDocument = userShelfRepository.findByUserId(userId);
 			response.setUserShelfDocument(userShelfDocument);
 		} catch (Exception e) {
-			throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Can't retrieve user shelf");
+			throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+					HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_RETRIEVE_USER_SHELF, e);
 		}
 		return response;
 	}
@@ -43,15 +47,21 @@ public class UserShelfServiceImpl implements UserShelfService{
 	@Override
 	public UserShelfResponse createNewShelf(CreateNewShelfReq req) throws UserShelfServiceException {
 		UserShelfResponse response = new UserShelfResponse();
-		try {
 			List<Shelf> shelves = null;
 			//create the new shelf
 			Shelf shelf = new Shelf();
 			shelf.setShelfName(req.getShelfName());
 			shelf.setDate(Calendar.getInstance());
 			shelf.setBooks(null);
+			UserShelfDocument userShelfDocumentDB = null;
 
-			UserShelfDocument userShelfDocumentDB = userShelfRepository.findByUserId(req.getUser().getUserId());
+			try {
+				userShelfDocumentDB = userShelfRepository.findByUserId(req.getUser().getUserId());
+			} catch (Exception e) {
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+						HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+			}
+			
 			//check if the doc is null
 			if(userShelfDocumentDB == null){
 				//create a  new doc and save it
@@ -64,7 +74,8 @@ public class UserShelfServiceImpl implements UserShelfService{
 			}else{
 				shelves = 	userShelfDocumentDB.getShelves();
 				if(shelves.contains(shelf)){
-					throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Shelf is already present");
+					throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.ALREADY_REPORTED.value(), 
+							HttpStatus.OK.value(), SHELF_ALREADY_PRESNT);
 				}else{
 					shelves.add(shelf);
 					userShelfDocumentDB.setShelves(shelves);
@@ -74,13 +85,9 @@ public class UserShelfServiceImpl implements UserShelfService{
 			//save the entry
 			userShelfDocumentDB = userShelfRepository.save(userShelfDocumentDB);
 			response.setUserShelfDocument(userShelfDocumentDB);
-		} catch
-		(Exception e) {
-			throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Can't save user shelf");
+			return response;
 		}
-		return response;
-	}
-
+		
 	@Override
 	public UserShelfResponse updateShelf(UserShelfDocument userShelfDocument) throws UserShelfServiceException {
 		UserShelfResponse response = new UserShelfResponse();
@@ -91,7 +98,8 @@ public class UserShelfServiceImpl implements UserShelfService{
 			response.setUserShelfDocument(userShelfDocumentSaved);
 		} catch
 		(Exception e) {
-			throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Can't save user shelf");
+			throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+					HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
 		}
 		return response;
 	}
@@ -105,24 +113,32 @@ public class UserShelfServiceImpl implements UserShelfService{
 		Shelf newShelf = new Shelf();
 		Shelf oldShelf = new Shelf();
 		
+		UserShelfDocument userShelfDocumentSaved = null;
 		newShelf.setShelfName(newShelfName);
 		oldShelf.setShelfName(oldShelfName);
 		try {
+			userShelfDocumentSaved = userShelfRepository.findByUserId(addBookToShelfReq.getUserId());
+		} catch (Exception e) {
+			throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+					HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+		}
 			//find out the document from db
-			UserShelfDocument userShelfDocumentSaved = userShelfRepository.findByUserId(addBookToShelfReq.getUserId());
 			if(userShelfDocumentSaved == null){
-				throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "No data present for this user id");
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+						HttpStatus.NOT_FOUND.value(), "NO Data found for the user");
 			}
 			int oldShelfIndex = -1; //find the indices of both the shelves to use it at later point
 			int newShelfIndex = -1;
 				oldShelfIndex = userShelfDocumentSaved.getShelves().indexOf(oldShelf);
 				newShelfIndex = userShelfDocumentSaved.getShelves().indexOf(newShelf);
 			if(newShelfIndex == -1){
-				throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "New User shelf is not present");
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+						HttpStatus.NOT_FOUND.value(), "Shelf User not found");
 			}
 			//check if there is no user shelf
 			if(userShelfDocumentSaved != null && userShelfDocumentSaved.getShelves().size() == 0){
-				throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "User doesn't have any shelf");
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+						HttpStatus.NOT_FOUND.value(), "User does not have any shelf");
 			}
 			//Add the book in the new shelf
 			if(!newShelfName.equals("")){
@@ -132,7 +148,8 @@ public class UserShelfServiceImpl implements UserShelfService{
 					books = new ArrayList<>();
 				}
 				if(books.indexOf(addBookToShelfReq.getBook()) != -1){
-					throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Book is already there in the shelf");
+					throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+							HttpStatus.OK.value(), "Shelf User not found");
 				}
 					//add the date for the book
 					books.add(addBookToShelfReq.getBook());
@@ -144,16 +161,19 @@ public class UserShelfServiceImpl implements UserShelfService{
 			//Delete the book from the old shelf
 			if(!oldShelfName.equals("") && !newShelfName.equals("")){
 				if(oldShelfIndex == -1){
-					throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Old shelf is not present");
+					throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+							HttpStatus.NOT_FOUND.value(), "Old shelf not found");
 				}
 				List<ShelfBook> books = userShelfDocumentSaved.getShelves().get(oldShelfIndex).getBooks();
 				if(books == null){
-					throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "No books are present in the old shelf");
+					throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+							HttpStatus.NOT_FOUND.value(), "No Books are found for old shelf");
 				}
 			//find the index of the book from the old shelf
 				int bookIndex = books.indexOf(addBookToShelfReq.getBook());
 				if(bookIndex == -1){
-					throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "This book is not present in the shelf");
+					throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+							HttpStatus.NOT_FOUND.value(), "Book not present in shelf");
 				}
 				//delete the book from the shelf
 				books.remove(bookIndex);
@@ -161,16 +181,18 @@ public class UserShelfServiceImpl implements UserShelfService{
 				//set the old shelf in the book shelves
 				userShelfDocumentSaved.getShelves().set(oldShelfIndex, oldShelf);
 			}
-			//save the user shelf document
-			userShelfDocumentSaved = userShelfRepository.save(userShelfDocumentSaved);
-			response.setUserShelfDocument(userShelfDocumentSaved);
-		} catch
-		(Exception e) {
-			throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Can't save user shelf");
+			try {
+				//save the user shelf document
+				userShelfDocumentSaved = userShelfRepository.save(userShelfDocumentSaved);
+				response.setUserShelfDocument(userShelfDocumentSaved);
+			} catch (Exception e) {
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+						HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+			}
+			
+			return response;
 		}
-		return response;
-	}
-
+		
 	@Override
 	public UserShelfResponse removeBookFromShelf(RemoveBookFromShelfReq request)
 			throws UserShelfServiceException {
@@ -183,21 +205,29 @@ public class UserShelfServiceImpl implements UserShelfService{
 		shelf.setShelfName(request.getShelfName());
 		try {
 			savedUserShelfDoc = userShelfRepository.findByUserId(request.getUserId());
+		} catch (Exception e) {
+			throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+					HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+		}
+			
 			//find the index of shelf from the doc 
 			int shelfIndex = savedUserShelfDoc.getShelves().indexOf(shelf);
 			//get the book index from the books
 			int bookIndex = savedUserShelfDoc.getShelves().get(shelfIndex).getBooks().indexOf(shelfBook);
 			if(bookIndex == -1){
-				throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Can't remove the book from shelf");
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+						HttpStatus.NOT_FOUND.value(), "Can't remove the book from shelf");
 			}
-			//remove the book from the book shelves
-			savedUserShelfDoc.getShelves().get(shelfIndex).getBooks().remove(bookIndex);
-			//save the document 
-			savedUserShelfDoc = userShelfRepository.save(savedUserShelfDoc);
-		} catch (Exception e) {
-			throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-					"Can't remove the book from the shelf");
-		}
+			try {
+				//remove the book from the book shelves
+				savedUserShelfDoc.getShelves().get(shelfIndex).getBooks().remove(bookIndex);
+				//save the document 
+				savedUserShelfDoc = userShelfRepository.save(savedUserShelfDoc);
+			} catch (Exception e) {
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+						HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+			}
+			
 		response.setUserShelfDocument(savedUserShelfDoc);
 		return response;
 	}
@@ -211,19 +241,23 @@ public class UserShelfServiceImpl implements UserShelfService{
 		shelf.setShelfName(request.getShelfName());
 		try {
 			savedUserShelfDoc = userShelfRepository.findByUserId(request.getUserId());
+		} catch (Exception e) {
+			throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+					HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+		}
 			//find the shelf index
 			boolean deleted = savedUserShelfDoc.getShelves().remove(shelf);
 			if(!deleted){
-				throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-						"No shelf found. So can't delete");
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+						HttpStatus.NOT_FOUND.value(), "No shelf found. So can't delete.");
 			}
-			savedUserShelfDoc = userShelfRepository.save(savedUserShelfDoc);
-			response.setUserShelfDocument(savedUserShelfDoc);
-		} catch (Exception e) {
-			throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-					"Can't delete the shelf from the rack");
-		}
-		// TODO Auto-generated method stub
+			try {
+				savedUserShelfDoc = userShelfRepository.save(savedUserShelfDoc);
+				response.setUserShelfDocument(savedUserShelfDoc);
+			} catch (Exception e) {
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+						HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+			}
 		return response;
 	}
 
@@ -237,19 +271,25 @@ public class UserShelfServiceImpl implements UserShelfService{
 		newShelf.setShelfName(request.getNewShelfName());
 		try {
 			savedUserShelfDoc = userShelfRepository.findByUserId(request.getUserId());
+		} catch (Exception e) {
+			throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+					HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+		}
 			//get the old shelf index
 			int oldShelfIndex = savedUserShelfDoc.getShelves().indexOf(oldShelf);
 			if(oldShelfIndex == -1){
-				throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-						"Old Shelf does not exist. So can't rename the shelf");
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+						HttpStatus.NOT_FOUND.value(), "Can't rename shelf");
 			}
-			savedUserShelfDoc.getShelves().get(oldShelfIndex).setShelfName(request.getNewShelfName());
-			savedUserShelfDoc = userShelfRepository.save(savedUserShelfDoc);
-		} catch (Exception e) {
-			throw new UserShelfServiceException(1, 1, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-					"Can't rename the shelf from the rack");
-		}
-		response.setUserShelfDocument(savedUserShelfDoc);
+			try {
+				savedUserShelfDoc.getShelves().get(oldShelfIndex).setShelfName(request.getNewShelfName());
+				savedUserShelfDoc = userShelfRepository.save(savedUserShelfDoc);
+				response.setUserShelfDocument(savedUserShelfDoc);
+			} catch (Exception e) {
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+						HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+			}
+			
 		return response;
 	}
 

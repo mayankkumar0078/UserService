@@ -43,7 +43,7 @@ public class UserAccountService {
 	private static Logger log = Logger.getLogger(UserAccountService.class);
 
 	public static final String EMAIL_NOT_VALID = "The e-mail you have entered is not valid.";
-	public static final String USER_ALREADY_EXIST = "USER_ALREADY_EXIST";
+	public static final String USER_ALREADY_EXIST = "User already exists. Try with some other User Email";
 
 	private static final String PASSWORD_CANNOT_BE_USED = "Your password is not acceptable by the organizational password policy.";
 	private static final String PASSWORD_IS_TOO_LONG = "Password is too long";

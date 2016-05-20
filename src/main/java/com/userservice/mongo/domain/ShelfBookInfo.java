@@ -2,7 +2,7 @@ package com.userservice.mongo.domain;
 
 import java.util.Calendar;
 
-public class ShelfBook {
+public class ShelfBookInfo {
 	private String bookId;
 	private String title;
 	private Boolean has_fulltext;
@@ -61,10 +61,10 @@ public class ShelfBook {
 		 if (o == this) {
 	            return true;
 	        }
-	        if (!(o instanceof ShelfBook)) {
+	        if (!(o instanceof ShelfBookInfo)) {
 	            return false;
 	        }
-	        ShelfBook c = (ShelfBook) o;
+	        ShelfBookInfo c = (ShelfBookInfo) o;
 	        return this.bookId.equals(c.getBookId());
 	}
 	public Boolean getHas_fulltext() {

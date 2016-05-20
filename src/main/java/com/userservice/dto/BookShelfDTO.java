@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 
 public class BookShelfDTO extends BaseDTO {
 	
-	@NotNull(message="ShelfBook Shelf name can't be null")
+	@NotNull(message="ShelfBookInfo Shelf name can't be null")
     private String bookShelfName;
 	
 	@NotNull(message="Username can't be null")

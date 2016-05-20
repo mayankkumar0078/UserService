@@ -3,7 +3,7 @@ package com.cd.notes.mongo.domain;
 import java.util.Calendar;
 import java.util.List;
 
-import com.cd.book.notes.document.NotesDocument;
+import com.userservice.mongo.document.NotesDocument;
 
 public class NotesShelf {
 	private String shelfName;

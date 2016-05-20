@@ -4,7 +4,7 @@ import com.userservice.mongo.dto.request.NotesSearchCriteria;
 import com.userservice.mongo.exception.UserNotesServiceException;
 import com.userservice.mongo.response.NotesResponse;
 
-public interface UserNotesService {
+public interface NotesService {
 
 	NotesResponse getAllNotes(NotesSearchCriteria searchCriteria) throws UserNotesServiceException;
 }

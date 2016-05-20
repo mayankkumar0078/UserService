@@ -2,7 +2,7 @@ package com.userservice.mongo.response;
 
 import java.util.List;
 
-import com.cd.book.notes.document.NotesDocument;
+import com.userservice.mongo.document.NotesDocument;
 import com.userservice.response.BaseResponse;
 
 public class NotesResponse extends BaseResponse{

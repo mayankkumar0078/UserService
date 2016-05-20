@@ -12,19 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.cd.book.notes.document.NotesDocument;
 import com.userservice.constants.UserAccountConstants;
+import com.userservice.mongo.document.NotesDocument;
 import com.userservice.mongo.dto.request.NotesSearchCriteria;
 import com.userservice.mongo.exception.UserNotesServiceException;
 import com.userservice.mongo.repository.NotesRepository;
-import com.userservice.mongo.repository.UserNotesRepository;
 import com.userservice.mongo.response.NotesResponse;
-import com.userservice.mongo.service.UserNotesService;
+import com.userservice.mongo.service.NotesService;
 
 @Service
-public class UserNotesServiceImpl implements UserNotesService{
-	@Autowired
-	private UserNotesRepository userNotesRepository;
+public class NotesServiceImpl implements NotesService{
+	//@Autowired
+	//private UserNotesRepository userNotesRepository;
 	
 	@Autowired
 	private NotesRepository notesRepository;

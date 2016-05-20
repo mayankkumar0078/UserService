@@ -3,7 +3,7 @@ package com.userservice.dto;
 import javax.validation.constraints.NotNull;
 
 public class BookInBookShelfDTO extends BaseDTO {
-	@NotNull(message="ShelfBook Id can't be null")
+	@NotNull(message="ShelfBookInfo Id can't be null")
 	private Integer bookId;
 	
 	private Boolean isActive;

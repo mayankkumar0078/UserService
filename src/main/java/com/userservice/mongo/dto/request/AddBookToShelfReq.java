@@ -1,12 +1,12 @@
 package com.userservice.mongo.dto.request;
 
-import com.userservice.mongo.domain.ShelfBook;
+import com.userservice.mongo.domain.ShelfBookInfo;
 
 public class AddBookToShelfReq {
 private String userId;
 private String oldShelfName;
 private String newShelfName;
-private ShelfBook book;
+private ShelfBookInfo book;
 
 public String getUserId() {
 	return userId;
@@ -26,10 +26,10 @@ public String getNewShelfName() {
 public void setNewShelfName(String newShelfName) {
 	this.newShelfName = newShelfName;
 }
-public ShelfBook getBook() {
+public ShelfBookInfo getBook() {
 	return book;
 }
-public void setBook(ShelfBook book) {
+public void setBook(ShelfBookInfo book) {
 	this.book = book;
 }
 }

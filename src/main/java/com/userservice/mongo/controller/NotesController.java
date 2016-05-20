@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cd.book.notes.document.NotesDocument;
-import com.cd.book.notes.document.UserNotesDocument;
 import com.cd.notes.mongo.domain.NotesShelf;
+import com.userservice.mongo.document.NotesDocument;
 import com.userservice.mongo.domain.College;
 import com.userservice.mongo.domain.Program;
 import com.userservice.mongo.domain.Specialisation;
@@ -24,24 +23,23 @@ import com.userservice.mongo.domain.User;
 import com.userservice.mongo.dto.request.NotesSearchCriteria;
 import com.userservice.mongo.exception.UserNotesServiceException;
 import com.userservice.mongo.repository.NotesRepository;
-import com.userservice.mongo.repository.UserNotesRepository;
 import com.userservice.mongo.response.NotesResponse;
 import com.userservice.mongo.response.transformer.UserNotesResponseTransformer;
-import com.userservice.mongo.service.UserNotesService;
+import com.userservice.mongo.service.NotesService;
 
 @RestController
 @EnableAutoConfiguration
 @RequestMapping(value = "user/notes", produces = {"application/json", "application/xml"})
-public class UserNotesController {
+public class NotesController {
 
-	@Autowired
-	private UserNotesRepository userNotesRepository;
+	//@Autowired
+	//private UserNotesRepository userNotesRepository;
 	
 	@Autowired
 	private NotesRepository notesRepository;
 	
 	@Autowired
-	private UserNotesService userNotesService;
+	private NotesService userNotesService;
 	
 	@Resource
 	private UserNotesResponseTransformer userNotesResponseTransformer; 
@@ -436,7 +434,7 @@ public class UserNotesController {
 		shelf5.setNotesList(notesList5);
 		shelf6.setNotesList(notesList6);
 		
-		UserNotesDocument doc1 = new UserNotesDocument();
+		/*UserNotesDocument doc1 = new UserNotesDocument();
 		UserNotesDocument doc2 = new UserNotesDocument();
 		UserNotesDocument doc3 = new UserNotesDocument();
 		UserNotesDocument doc4 = new UserNotesDocument();
@@ -471,10 +469,10 @@ public class UserNotesController {
 		doc6.setUser(user6);
 		List<NotesShelf> list6 = new ArrayList<>();
 		list6.add(shelf6);
-		doc6.setNotesShelves(list6);
+		doc6.setNotesShelves(list6);*/
 		
 		try {
-			notesRepository.deleteAll();
+			//notesRepository.deleteAll();
 			//save all the user notes to db
 			notesRepository.save(note1);
 			notesRepository.save(note2);

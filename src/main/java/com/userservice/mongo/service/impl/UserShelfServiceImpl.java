@@ -9,13 +9,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.userservice.constants.UserAccountConstants;
+import com.userservice.mongo.document.NotesDocument;
 import com.userservice.mongo.document.UserShelfDocument;
 import com.userservice.mongo.domain.Shelf;
-import com.userservice.mongo.domain.ShelfBook;
+import com.userservice.mongo.domain.ShelfBookInfo;
 import com.userservice.mongo.dto.request.AddBookToShelfReq;
+import com.userservice.mongo.dto.request.AddNotesToShelfReq;
 import com.userservice.mongo.dto.request.CreateNewShelfReq;
 import com.userservice.mongo.dto.request.DeleteShelfReq;
 import com.userservice.mongo.dto.request.RemoveBookFromShelfReq;
+import com.userservice.mongo.dto.request.RemoveNotesFromShelfReq;
 import com.userservice.mongo.dto.request.RenameShelfReq;
 import com.userservice.mongo.exception.UserShelfServiceException;
 import com.userservice.mongo.repository.UserShelfRepository;
@@ -143,7 +146,7 @@ public class UserShelfServiceImpl implements UserShelfService{
 			//Add the book in the new shelf
 			if(!newShelfName.equals("")){
 				//get the books from the shelf and on top of that add new book
-				List<ShelfBook> books = userShelfDocumentSaved.getShelves().get(newShelfIndex).getBooks();
+				List<ShelfBookInfo> books = userShelfDocumentSaved.getShelves().get(newShelfIndex).getBooks();
 				if(books == null){
 					books = new ArrayList<>();
 				}
@@ -164,7 +167,7 @@ public class UserShelfServiceImpl implements UserShelfService{
 					throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
 							HttpStatus.NOT_FOUND.value(), "Old shelf not found");
 				}
-				List<ShelfBook> books = userShelfDocumentSaved.getShelves().get(oldShelfIndex).getBooks();
+				List<ShelfBookInfo> books = userShelfDocumentSaved.getShelves().get(oldShelfIndex).getBooks();
 				if(books == null){
 					throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
 							HttpStatus.NOT_FOUND.value(), "No Books are found for old shelf");
@@ -200,7 +203,7 @@ public class UserShelfServiceImpl implements UserShelfService{
 		UserShelfDocument savedUserShelfDoc = null;
 		//make the shelf object
 		Shelf shelf = new Shelf();
-		ShelfBook shelfBook = new ShelfBook();
+		ShelfBookInfo shelfBook = new ShelfBookInfo();
 		shelfBook.setBookId(request.getBookId());
 		shelf.setShelfName(request.getShelfName());
 		try {
@@ -293,4 +296,134 @@ public class UserShelfServiceImpl implements UserShelfService{
 		return response;
 	}
 
+	@Override
+	public UserShelfResponse addNotesToShelf(AddNotesToShelfReq request)
+			throws UserShelfServiceException {
+		
+		//create the objects
+		UserShelfResponse response = new UserShelfResponse();
+				String oldShelfName = request.getOldShelfName();
+				String newShelfName = request.getNewShelfName();
+				Shelf newShelf = new Shelf();
+				Shelf oldShelf = new Shelf();
+				
+				UserShelfDocument userShelfDocumentSaved = null;
+				newShelf.setShelfName(newShelfName);
+				oldShelf.setShelfName(oldShelfName);
+				try {
+					userShelfDocumentSaved = userShelfRepository.findByUserId(request.getUserId());
+				} catch (Exception e) {
+					throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+							HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+				}
+					//find out the document from db
+					if(userShelfDocumentSaved == null){
+						throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+								HttpStatus.NOT_FOUND.value(), "NO Data found for the user");
+					}
+					int oldShelfIndex = -1; //find the indices of both the shelves to use it at later point
+					int newShelfIndex = -1;
+						oldShelfIndex = userShelfDocumentSaved.getShelves().indexOf(oldShelf);
+						newShelfIndex = userShelfDocumentSaved.getShelves().indexOf(newShelf);
+					if(newShelfIndex == -1){
+						throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+								HttpStatus.NOT_FOUND.value(), "Shelf User not found");
+					}
+					//check if there is no user shelf
+					if(userShelfDocumentSaved != null && userShelfDocumentSaved.getShelves().size() == 0){
+						throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+								HttpStatus.NOT_FOUND.value(), "User does not have any shelf");
+					}
+					//Add the notes in the new shelf
+					if(!newShelfName.equals("")){
+						//get the books from the shelf and on top of that add new book
+						List<NotesDocument> notesList = userShelfDocumentSaved.getShelves().get(newShelfIndex).getNotesList();
+						if(notesList == null){
+							notesList = new ArrayList<>();
+						}
+						if(notesList.indexOf(request.getNotes()) != -1){
+							throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_ACCEPTABLE.value(), 
+									HttpStatus.OK.value(), "notes document not found");
+						}
+							//add the date for the book
+							notesList.add(request.getNotes());
+							newShelf.setNotesList(notesList);
+							//set the new shelf in the book shelves
+							userShelfDocumentSaved.getShelves().set(newShelfIndex, newShelf);
+					}
+					
+					//Delete the book from the old shelf
+					if(!oldShelfName.equals("") && !newShelfName.equals("")){
+						if(oldShelfIndex == -1){
+							throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+									HttpStatus.NOT_FOUND.value(), "Old shelf not found");
+						}
+						List<NotesDocument> notesList = userShelfDocumentSaved.getShelves().get(oldShelfIndex).getNotesList();
+						if(notesList == null){
+							throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+									HttpStatus.NOT_FOUND.value(), "No notes are found for old shelf");
+						}
+					//find the index of the book from the old shelf
+						int notesIndex = notesList.indexOf(request.getNotes());
+						if(notesIndex == -1){
+							throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+									HttpStatus.NOT_FOUND.value(), "notes not present in shelf");
+						}
+						//delete the book from the shelf
+						notesList.remove(notesIndex);
+						oldShelf.setNotesList(notesList);
+						//set the old shelf in the book shelves
+						userShelfDocumentSaved.getShelves().set(oldShelfIndex, oldShelf);
+					}
+					try {
+						//save the user shelf document
+						userShelfDocumentSaved = userShelfRepository.save(userShelfDocumentSaved);
+						response.setUserShelfDocument(userShelfDocumentSaved);
+					} catch (Exception e) {
+						throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+								HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+					}
+					
+					return response;
+	}
+
+	@Override
+	public UserShelfResponse removeNotesFromShelf(RemoveNotesFromShelfReq request)
+			throws UserShelfServiceException {
+		
+		UserShelfResponse response = new UserShelfResponse();
+		UserShelfDocument savedUserShelfDoc = null;
+		//make the shelf object
+		Shelf shelf = new Shelf();
+		NotesDocument notesDocument = new NotesDocument();
+		notesDocument.setId(request.getNotesId());
+		shelf.setShelfName(request.getShelfName());
+		try {
+			savedUserShelfDoc = userShelfRepository.findByUserId(request.getUserId());
+		} catch (Exception e) {
+			throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+					HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+		}
+			
+			//find the index of shelf from the doc 
+			int shelfIndex = savedUserShelfDoc.getShelves().indexOf(shelf);
+			//get the book index from the books
+			int notesIndex = savedUserShelfDoc.getShelves().get(shelfIndex).getNotesList().indexOf(notesDocument);
+			if(notesIndex == -1){
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.NOT_FOUND.value(), 
+						HttpStatus.NOT_FOUND.value(), "Notes is not there in the shelf");
+			}
+			try {
+				//remove the book from the book shelves
+				savedUserShelfDoc.getShelves().get(shelfIndex).getNotesList().remove(notesIndex);
+				//save the document 
+				savedUserShelfDoc = userShelfRepository.save(savedUserShelfDoc);
+			} catch (Exception e) {
+				throw new UserShelfServiceException(UserAccountConstants.APPLICATION_CODE_USER_SERVICE, HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+						HttpStatus.INTERNAL_SERVER_ERROR.value(), CANT_PROCESS_REQUEST, e);
+			}
+			
+		response.setUserShelfDocument(savedUserShelfDoc);
+		return response;
+	}
 }

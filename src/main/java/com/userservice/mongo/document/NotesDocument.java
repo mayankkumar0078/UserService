@@ -1,4 +1,4 @@
-package com.cd.book.notes.document;
+package com.userservice.mongo.document;
 
 import java.io.File;
 import java.util.Calendar;
@@ -105,4 +105,16 @@ public class NotesDocument {
 		this.subject = subject;
 	}
 
+	@Override
+	public boolean equals(Object o){
+		 if (o == this) {
+	            return true;
+	        }
+	        if (!(o instanceof NotesDocument)) {
+	            return false;
+	        }
+	        NotesDocument n = (NotesDocument) o;
+	        return id.equals(n.getId());
+	}
+	
 }

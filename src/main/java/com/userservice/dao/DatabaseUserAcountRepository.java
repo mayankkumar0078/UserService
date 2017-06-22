@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Repository;
 
 import com.userservice.constants.StatusType;
 import com.userservice.entity.User;

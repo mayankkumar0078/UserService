@@ -1,4 +1,4 @@
-package com.userservice.mongo.controller;
+/*package com.userservice.mongo.controller;
 
 import javax.annotation.Resource;
 
@@ -36,10 +36,10 @@ public class UserShelfController {
 	@Autowired
 	private UserShelfResponseTransformer userShelfResponseTransformer;
 	
-	/**
+	*//**
 	 * Retrieve the shelves based on the user id provided
 	 * @param userId
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping( method =  RequestMethod.GET, produces = {"application/json", "application/xml"})
 	public UserShelfResponse retrieveShelves(@RequestParam("userId") String userId){
@@ -53,10 +53,10 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
-	/**
+	*//**
 	 * Creates a new shelf for a user
 	 * @param CreateNewShelfReq
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping( method = RequestMethod.POST, produces = {"application/json", "application/xml"})
 	public UserShelfResponse createNewShelf(@RequestBody CreateNewShelfReq req){
@@ -70,10 +70,10 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 
-	/**
+	*//**
 	 * Updates the shelf
 	 * @param UserShelfDocument
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping( method = RequestMethod.PUT, produces = {"application/json", "application/xml"})
 	public UserShelfResponse updateShelf(@RequestBody UserShelfDocument userShelfDocument){
@@ -87,10 +87,10 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
-	/**
+	*//**
 	 * Deletes a shelf
 	 * @param DeleteShelfReq
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping(value = "/delete", method = RequestMethod.PUT, produces = {"application/json", "application/xml"})
 	public UserShelfResponse deleteShelf(@RequestBody DeleteShelfReq request){
@@ -104,10 +104,10 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
-	/**
+	*//**
 	 * Renames a shelf
 	 * @param RenameShelfReq
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping(value = "/rename", method = RequestMethod.PUT, produces = {"application/json", "application/xml"})
 	public UserShelfResponse renameShelf(@RequestBody RenameShelfReq request){
@@ -121,10 +121,10 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
-	/**
+	*//**
 	 * Add book to shelf
 	 * @param AddBookToShelfReq
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping(value="/add/book", method = RequestMethod.PUT, produces = {"application/json", "application/xml"})
 	public UserShelfResponse addBookToShelf(@RequestBody AddBookToShelfReq addBookToShelfReq){
@@ -138,10 +138,10 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
-	/**
+	*//**
 	 * Add notes to shelf
 	 * @param AddNotesToShelfReq
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping(value="/add/notes", method = RequestMethod.PUT, produces = {"application/json", "application/xml"})
 	public UserShelfResponse addNotesToShelf(@RequestBody AddNotesToShelfReq addNotesToShelfReq){
@@ -155,10 +155,10 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 	
-	/**
+	*//**
 	 * Remove book from shelf
 	 * @param RemoveBookFromShelfReq
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping(value="/remove/book", method = RequestMethod.PUT, produces = {"application/json", "application/xml"})
 	public UserShelfResponse removeBookFromShelf(@RequestBody RemoveBookFromShelfReq request){
@@ -172,10 +172,10 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 
-	/**
+	*//**
 	 * Remove book from shelf
 	 * @param bookId
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping(value="/remove/notes", method = RequestMethod.PUT, produces = {"application/json", "application/xml"})
 	public UserShelfResponse removeNotesFromShelf(@RequestBody RemoveNotesFromShelfReq request){
@@ -189,3 +189,4 @@ public class UserShelfController {
 		return (UserShelfResponse)userShelfResponseTransformer.transformIntoSuccessResponse(response);
 	}
 }
+*/

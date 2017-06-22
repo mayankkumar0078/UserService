@@ -23,37 +23,52 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.userservice.dao.DatabaseUserAcountRepository;
 import com.userservice.dao.UserAccountRepository;
-import com.userservice.filter.CORSFilter;
 import com.userservice.repository.policy.PasswordPolicyFactory;
 import com.userservice.repository.policy.PasswordPolicyRepository;
 import com.userservice.repository.policy.PasswordPolicyRepositoryFileImpl;
 import com.userservice.service.StatelessAuthenticationFilter;
 import com.userservice.service.TokenAuthenticationService;
-import com.userservice.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired(required = true)
-	private UserService userService = null;
 
 	@Autowired(required = true)
 	private TokenAuthenticationService tokenAuthenticationService = null;
 
-	@Autowired(required = true)
-	private UserAccountRepository userAccountRepository = null;
-
 	public SecurityConfig() {
 		super(true);
 	}
-
+	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
-	protected void configure(HttpSecurity http) throws Exception {
+	protected void configure(HttpSecurity http) throws Exception {/*
+		http.csrf().disable();
+		http.authorizeRequests()
+				.antMatchers("/userModule/Users/**", "/aa/**", "/rp/**","/userModule/BookShelves/**","/user/shelf/**","/user/notes/**","/http://openlibrary.org/**")
+				.permitAll()
+				.anyRequest()
+				.authenticated()
+				.and()
+				.addFilterBefore(
+						new StatelessAuthenticationFilter(
+								tokenAuthenticationService),
+						UsernamePasswordAuthenticationFilter.class);
+		
+		ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry security=http
+				.csrf()
+				.disable().authorizeRequests().antMatchers("/").authenticated().antMatchers("/userModule/Users/**").permitAll();
+		//security.anyRequest().authenticated();
+		security.and().addFilterBefore(new StatelessAuthenticationFilter(
+								tokenAuthenticationService),
+						UsernamePasswordAuthenticationFilter.class);
+		
+	*/
+		
 		http.csrf().disable();
 		http.exceptionHandling()
 				.and()
@@ -99,6 +114,38 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new TokenAuthenticationService("tooManySecrets",
 				userDetailsService());
 	}
+	
+	/*@Bean
+    public FilterSecurityInterceptor filterSecurityInterceptor()
+            throws Exception {
+        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+        filterSecurityInterceptor
+                .setAuthenticationManager(authenticationManager());
+        filterSecurityInterceptor
+        .setAccessDecisionManager(accessDecisionManager());
+        LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = new LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>>();
+        List<ConfigAttribute> configs = new ArrayList<ConfigAttribute>();
+        configs.add(new org.springframework.security.access.SecurityConfig("isAuthenticated()"));
+        requestMap.put(new AntPathRequestMatcher("/**"), configs);
+        FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource = new ExpressionBasedFilterInvocationSecurityMetadataSource(
+                requestMap, new DefaultWebSecurityExpressionHandler());
+        filterSecurityInterceptor
+                .setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
+        filterSecurityInterceptor.afterPropertiesSet();
+
+        return filterSecurityInterceptor;
+    }*/
+	
+	/*public AffirmativeBased accessDecisionManager() throws Exception {
+        List<AccessDecisionVoter<? extends Object>> voters = new ArrayList<AccessDecisionVoter<? extends Object>>();
+        voters.add(new WebExpressionVoter());
+        voters.add(new RoleVoter());
+        AffirmativeBased affirmativeBased = new AffirmativeBased(voters);
+        affirmativeBased.setAllowIfAllAbstainDecisions(false);
+        affirmativeBased.afterPropertiesSet();
+
+        return affirmativeBased;
+    }*/
 
 	/*
 	 * @Bean public TokenHandler tokenHandler() { return new

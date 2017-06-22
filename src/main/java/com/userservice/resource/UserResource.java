@@ -68,7 +68,7 @@ public class UserResource {
 
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.POST, produces = { "application/json" })
-	public final UserResponse createUserAccount(@RequestBody UserDTO userDTO,
+	public UserResponse createUserAccount(@RequestBody UserDTO userDTO,
 			HttpServletRequest request) throws IOException {
 		userDTO.setLastName("Raut");
 		log.debug("/userModule/User/: email=" + userDTO.getEmail()

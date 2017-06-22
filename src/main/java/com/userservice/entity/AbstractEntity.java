@@ -5,7 +5,6 @@ package com.userservice.entity;
  * 
  */
 import java.io.Serializable;
-import java.util.Collection;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,7 +16,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

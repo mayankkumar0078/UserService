@@ -10,7 +10,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "book_shelf" ,uniqueConstraints = {@UniqueConstraint(columnNames = {"book_shelf_name", "user_id"})})

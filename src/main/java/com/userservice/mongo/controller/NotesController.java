@@ -1,4 +1,4 @@
-package com.userservice.mongo.controller;
+/*package com.userservice.mongo.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -434,7 +434,7 @@ public class NotesController {
 		shelf5.setNotesList(notesList5);
 		shelf6.setNotesList(notesList6);
 		
-		/*UserNotesDocument doc1 = new UserNotesDocument();
+		UserNotesDocument doc1 = new UserNotesDocument();
 		UserNotesDocument doc2 = new UserNotesDocument();
 		UserNotesDocument doc3 = new UserNotesDocument();
 		UserNotesDocument doc4 = new UserNotesDocument();
@@ -469,7 +469,7 @@ public class NotesController {
 		doc6.setUser(user6);
 		List<NotesShelf> list6 = new ArrayList<>();
 		list6.add(shelf6);
-		doc6.setNotesShelves(list6);*/
+		doc6.setNotesShelves(list6);
 		
 		try {
 			//notesRepository.deleteAll();
@@ -492,3 +492,4 @@ public class NotesController {
 		
 	}
 }
+*/

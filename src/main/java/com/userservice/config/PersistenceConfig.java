@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = { "com.userservice.dao" })
-@ComponentScan("com.userservice")
 public class PersistenceConfig {
 
 	@Autowired
